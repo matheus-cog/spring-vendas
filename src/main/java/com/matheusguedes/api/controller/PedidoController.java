@@ -13,7 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -31,18 +31,18 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/pedidos")
 @Api(description = "Esta aba inclui todas as operações a serem realizadas a um pedido.", tags = "Pedidos")
-@AllArgsConstructor
 public class PedidoController {
 
-    private PedidoService service;
+    private final PedidoService service;
 
     @PostMapping
     @ResponseStatus(CREATED)
     @ApiOperation("Salva um novo pedido.")
     @ApiResponse(code = 201, message = "")
-    public Integer save(@RequestBody @Valid PedidoDTO dto){
+    public Integer save(@RequestBody @Valid PedidoDTO dto) {
         return service.salvar(dto).getId();
     }
 
@@ -52,7 +52,7 @@ public class PedidoController {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 404, message = "Pedido não encontrado.")
     })
-    public InformacoesPedidoDTO findById(@PathVariable Integer id){
+    public InformacoesPedidoDTO findById(@PathVariable Integer id) {
         return service.obterPedidoCompleto(id)
                 .map(this::converter)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, PEDIDO_NAO_ENCONTRADO));
@@ -62,14 +62,14 @@ public class PedidoController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation("Atualiza status de um único pedido.")
     @ApiResponse(code = 200, message = "OK")
-    public void updateStatus(@PathVariable Integer id, @RequestBody AtualizacaoStatusPedidoDTO novoStatus){
-        if(StatusPedido.findByName(novoStatus.getNovoStatus()) == null){
+    public void updateStatus(@PathVariable Integer id, @RequestBody AtualizacaoStatusPedidoDTO novoStatus) {
+        if (StatusPedido.findByName(novoStatus.getNovoStatus()) == null) {
             throw new RegraNegocioException(ERROR_DURANTE_OPERACAO);
         }
         service.atualizaStatus(id, StatusPedido.valueOf(novoStatus.getNovoStatus()));
     }
 
-    private InformacoesPedidoDTO converter(Pedido pedido){
+    private InformacoesPedidoDTO converter(Pedido pedido) {
         return InformacoesPedidoDTO.builder()
                 .codigo(pedido.getId())
                 .dataPedido(pedido.getDataPedido().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
@@ -81,8 +81,8 @@ public class PedidoController {
                 .build();
     }
 
-    private List<InformacoesItensPedidoDTO> converter(List<ItemPedido> itens){
-        if(CollectionUtils.isEmpty(itens)){
+    private List<InformacoesItensPedidoDTO> converter(List<ItemPedido> itens) {
+        if (CollectionUtils.isEmpty(itens)) {
             return Collections.emptyList();
         }
         return itens.stream().map(item ->

@@ -2,6 +2,7 @@ package com.matheusguedes.domain.entity;
 
 import com.matheusguedes.domain.enums.StatusPedido;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,11 +11,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-@Entity
-@Table(name = "pedido")
 @Data
+@Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "pedido")
 public class Pedido {
 
     @Id

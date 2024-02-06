@@ -1,16 +1,18 @@
 package com.matheusguedes.domain.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Entity
-@Table(name = "item_pedido")
 @Data
+@Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "item_pedido")
 public class ItemPedido {
 
     @Id

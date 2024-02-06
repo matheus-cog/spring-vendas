@@ -24,7 +24,7 @@ import java.util.List;
 public class SwaggerConfig {
 
     @Bean
-    public Docket docket(){
+    public Docket docket() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .useDefaultResponseMessages(false)
                 .ignoredParameterTypes(
@@ -42,31 +42,31 @@ public class SwaggerConfig {
                 .apiInfo(apiInfo());
     }
 
-    private Contact contact(){
+    private Contact contact() {
         return new Contact("Matheus Guedes", "https://matheusguedes.com", "contato@matheusguedes.com");
     }
 
-    public ApiKey apiKey(){
+    public ApiKey apiKey() {
         return new ApiKey("JWT", "Authorization", "header");
     }
 
-    private SecurityContext securityContext(){
+    private SecurityContext securityContext() {
         return SecurityContext.builder()
                 .securityReferences(defaultAuth())
                 .forPaths(PathSelectors.any())
                 .build();
     }
 
-    private List<SecurityReference> defaultAuth(){
-        AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessAll");
-        AuthorizationScope[] scopes = new AuthorizationScope[]{authorizationScope};
-        SecurityReference reference = new SecurityReference("JWT", scopes);
-        List<SecurityReference> auths = new ArrayList<>();
+    private List<SecurityReference> defaultAuth() {
+        var authorizationScope = new AuthorizationScope("global", "accessAll");
+        var scopes = new AuthorizationScope[]{authorizationScope};
+        var reference = new SecurityReference("JWT", scopes);
+        var auths = new ArrayList<SecurityReference>();
         auths.add(reference);
         return auths;
     }
 
-    private ApiInfo apiInfo(){
+    private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("Vendas API")
                 .description("Serviço RESTful gerenciador de vendas.")

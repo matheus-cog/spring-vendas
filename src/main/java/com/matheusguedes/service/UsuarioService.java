@@ -1,9 +1,9 @@
-package com.matheusguedes.service.implementation;
+package com.matheusguedes.service;
 
 import com.matheusguedes.domain.entity.Usuario;
 import com.matheusguedes.domain.repository.UsuarioRepository;
 import com.matheusguedes.exception.SenhaInvalidaException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,23 +14,20 @@ import org.springframework.stereotype.Service;
 import static com.matheusguedes.api.Response.NOME_DE_USUARIO_INVALIDO;
 
 @Service
-public class UsuarioServiceImplementation implements UserDetailsService {
+@RequiredArgsConstructor
+public class UsuarioService implements UserDetailsService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    public Usuario salvar(Usuario usuario){
-        String senhaCriptografada = passwordEncoder.encode(usuario.getSenha());
-        usuario.setSenha(senhaCriptografada);
+    public Usuario salvar(Usuario usuario) {
+        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
         return usuarioRepository.save(usuario);
     }
 
-    public UserDetails autenticar(Usuario usuario){
-        UserDetails userDetails = loadUserByUsername(usuario.getUsername());
-        if(passwordEncoder.matches(usuario.getSenha(), userDetails.getPassword())){
+    public UserDetails autenticar(Usuario usuario) {
+        var userDetails = loadUserByUsername(usuario.getUsername());
+        if (passwordEncoder.matches(usuario.getSenha(), userDetails.getPassword())){
             return userDetails;
         }
         throw new SenhaInvalidaException();
@@ -38,10 +35,10 @@ public class UsuarioServiceImplementation implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Usuario usuario = usuarioRepository.findByUsername(username)
+        var usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(NOME_DE_USUARIO_INVALIDO));
 
-        String[] roles = usuario.isAdmin() ? new String[]{"ADMIN", "USER"} : new String[]{"USER"};
+        var roles = usuario.isAdmin() ? new String[] {"ADMIN", "USER"} : new String[] {"USER"};
 
         return User.builder()
                 .username(usuario.getUsername())

@@ -5,14 +5,13 @@ import com.matheusguedes.api.dto.TokenDTO;
 import com.matheusguedes.domain.entity.Usuario;
 import com.matheusguedes.exception.SenhaInvalidaException;
 import com.matheusguedes.security.jwt.JwtService;
-import com.matheusguedes.service.implementation.UsuarioServiceImplementation;
+import com.matheusguedes.service.UsuarioService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,9 +27,8 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final UsuarioServiceImplementation usuarioService;
-
     private final JwtService jwtService;
+    private final UsuarioService usuarioService;
 
     @PostMapping
     @ApiOperation("Realiza a autenticação do usuário.")
@@ -38,18 +36,22 @@ public class AuthController {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 404, message = "Usuário não encontrado.")
     })
-    public TokenDTO auth(@RequestBody @Valid CredenciaisDTO credenciais){
+    public TokenDTO auth(@RequestBody @Valid CredenciaisDTO credenciais) {
         try {
-            Usuario usuario = Usuario.builder()
-                    .username(credenciais.getUsername())
-                    .senha(credenciais.getSenha())
-                    .build();
-            UserDetails usuarioAutenticado = usuarioService.autenticar(usuario);
-            String token = jwtService.gerarToken(usuario);
+            var usuario = criarUsuario(credenciais);
+            var usuarioAutenticado = usuarioService.autenticar(usuario);
+            var token = jwtService.gerarToken(usuario);
             return new TokenDTO(usuarioAutenticado.getUsername(), token);
-        } catch (UsernameNotFoundException | SenhaInvalidaException ex){
+        } catch (UsernameNotFoundException | SenhaInvalidaException ex) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
         }
+    }
+
+    private static Usuario criarUsuario(CredenciaisDTO credenciais) {
+        return Usuario.builder()
+                .username(credenciais.getUsername())
+                .senha(credenciais.getSenha())
+                .build();
     }
 
 }

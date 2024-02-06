@@ -16,18 +16,18 @@ import java.util.HashMap;
 @Service
 public class JwtService {
 
-    @Value("${security.jwt.expiration-time}")
-    private String minutosParaExpirarToken;
-
     @Value("${security.jwt.key}")
     private String chaveAssinatura;
 
-    public String gerarToken(Usuario usuario){
-        long expiracaoString = Long.parseLong(minutosParaExpirarToken);
-        LocalDateTime dateTimeExpiracao = LocalDateTime.now().plusMinutes(expiracaoString);
-        Date data = Date.from(dateTimeExpiracao.atZone(ZoneId.systemDefault()).toInstant());
+    @Value("${security.jwt.expiration-time}")
+    private String minutosParaExpirarToken;
 
-        HashMap<String, Object> claims = new HashMap<>();
+    public String gerarToken(Usuario usuario) {
+        var expiracaoString = Long.parseLong(minutosParaExpirarToken);
+        var dateTimeExpiracao = LocalDateTime.now().plusMinutes(expiracaoString);
+        var data = Date.from(dateTimeExpiracao.atZone(ZoneId.systemDefault()).toInstant());
+
+        var claims = new HashMap<String, Object>();
         claims.put("username", usuario.getUsername());
         claims.put("admin", usuario.isAdmin());
 
@@ -49,14 +49,13 @@ public class JwtService {
         return obterClaims(token).get("username").toString();
     }
 
-    public boolean isTokenExpired(String token){
+    public boolean isTokenExpired(String token) {
         try {
-            Claims claims = obterClaims(token);
-            Date dateExpiracao = claims.getExpiration();
-            LocalDateTime dateTimeExpiracao = dateExpiracao.toInstant()
+            var dateExpiracao = obterClaims(token).getExpiration();
+            var dateTimeExpiracao = dateExpiracao.toInstant()
                     .atZone(ZoneId.systemDefault()).toLocalDateTime();
             return !LocalDateTime.now().isAfter(dateTimeExpiracao);
-        } catch (Exception ex){
+        } catch (Exception ex) {
             return false;
         }
     }

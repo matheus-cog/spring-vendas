@@ -12,8 +12,8 @@ import java.util.Locale;
 public class InternacionalizaoConfig {
 
     @Bean
-    public MessageSource messageSource(){
-        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+    public MessageSource messageSource() {
+        var messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:messages");
         messageSource.setDefaultEncoding("ISO-8859-1");
         messageSource.setDefaultLocale(Locale.getDefault());
@@ -21,8 +21,8 @@ public class InternacionalizaoConfig {
     }
 
     @Bean
-    public LocalValidatorFactoryBean validatorFactoryBean(){
-        LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
+    public LocalValidatorFactoryBean validatorFactoryBean() {
+        var bean = new LocalValidatorFactoryBean();
         bean.setValidationMessageSource(messageSource());
         return bean;
     }

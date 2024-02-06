@@ -2,8 +2,8 @@ package com.matheusguedes.config;
 
 import com.matheusguedes.security.jwt.JwtAuthFilter;
 import com.matheusguedes.security.jwt.JwtService;
-import com.matheusguedes.service.implementation.UsuarioServiceImplementation;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.matheusguedes.service.UsuarioService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,16 +14,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private JwtService jwtService;
-
-    @Autowired
-    private UsuarioServiceImplementation usuarioService;
+    private final JwtService jwtService;
+    private final UsuarioService usuarioService;
 
     @Bean
-    public OncePerRequestFilter jwtFilter(){
+    public OncePerRequestFilter jwtFilter() {
         return new JwtAuthFilter(jwtService, usuarioService);
     }
 
@@ -48,8 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Remoção de sessões
                 .and()
-                    .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class)
-        ;
+                    .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
 }
